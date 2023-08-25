@@ -1,4 +1,5 @@
-﻿using Application.Models;
+﻿using Application.Features.Behaviors.Contracts;
+using Application.Models;
 using Application.Repository;
 using Domain;
 using MediatR;

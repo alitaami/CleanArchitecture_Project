@@ -1,4 +1,5 @@
-﻿using Application.Repository;
+﻿using Application.Features.Behaviors.Contracts;
+using Application.Repository;
 using Domain;
 using MediatR;
 using System;
@@ -9,11 +10,16 @@ using System.Threading.Tasks;
 
 namespace Application.Features.Properties.Commands
 {
-    public class DeletePropertyRequest : IRequest<bool>
+    public class DeletePropertyRequest : IRequest<bool>, IRemovalCacheable
     {
+        public TimeSpan? SlidingExpiration { get; set; }
+        public string CacheKey { get; set; }
+        public bool ByPassCache { get; set; }
         public int PropertyId { get; set; }
+
         public DeletePropertyRequest(int propertyId)
         {
+            CacheKey = $"GetPropertyById:{propertyId}";
             PropertyId = propertyId;
         }
     }
@@ -25,7 +31,7 @@ namespace Application.Features.Properties.Commands
         {
             _repo = repo;
         }
-         async Task<bool> IRequestHandler<DeletePropertyRequest, bool>.Handle(DeletePropertyRequest request, CancellationToken cancellationToken)
+        async Task<bool> IRequestHandler<DeletePropertyRequest, bool>.Handle(DeletePropertyRequest request, CancellationToken cancellationToken)
         {
             var prop = await _repo.GetByIdAsync(request.PropertyId);
 
